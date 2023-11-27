@@ -37,6 +37,10 @@ dependencies:
   url_launcher: ^6.2.1
   google_fonts: ^6.1.0
   path_provider:
+  dio: ^5.3.4
+  permission_handler: ^11.1.0
+  http: ^1.1.0
+  archive: ^3.4.9
 
 dev_dependencies:
   flutter_test:
