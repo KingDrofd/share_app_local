@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:share_app_local/services/directory_handler.dart';
 import 'package:share_app_local/services/server/server_download.dart';
+import 'package:share_app_local/utils/utilities.dart';
 
 class Server {
   ServerDownload repo = ServerDownload();
@@ -30,25 +33,80 @@ class Server {
     result.stdout.transform(utf8.decoder).forEach(print);
   }
 
-  void downloadRepo() async {
-    if (directories.getServerFilePath().existsSync()) {
-      print('Found server.py at: ${directories.getServerFilePath().path}');
+  Future<void> downloadRepo() async {
+    final serverFilePath = directories.getServerFilePath();
+
+    if (directories.fileExists(serverFilePath.path)) {
+      print('Found server.py at: ${serverFilePath.path}\\py_serv_env');
     } else {
       print(
-          'No server.py found in the installation directory at: ${directories.getInstallationDirectory()}.');
+          'No server.py found in the installation directory at: ${directories.getInstallationDirectory()}\\py_serv_env.');
 
       await Future.delayed(Duration(seconds: 1));
 
       print("Cloning...");
 
-      await repo.cloneRepo(
-          "kingdrofd", "py_serv_env", directories.getInstallationDirectory());
-
-      print(
-          'Repository cloned successfully at: ${directories.getInstallationDirectory()}');
-      //  downloadRepository("kingdrofd/py_serv_env", directory);
-      //  cloneRepository(
-      //     "https://github.com/KingDrofd/py_serv_env.git", directory);
+      try {
+        await repo.cloneRepo(
+            "kingdrofd", "py_serv_env", directories.getInstallationDirectory());
+        if (directories.fileExists(serverFilePath.path)) {
+          print('Found server.py at: ${serverFilePath.path}\\py_serv_env');
+        }
+      } catch (e) {
+        print('Error during cloning: $e');
+      } finally {}
     }
+  }
+}
+
+class DownloadProgress extends StatefulWidget {
+  const DownloadProgress({super.key});
+
+  @override
+  State<DownloadProgress> createState() => _DownloadProgressState();
+}
+
+class _DownloadProgressState extends State<DownloadProgress> {
+  bool _downloading = false;
+  Directories directories = Directories();
+  @override
+  void initState() {
+    super.initState();
+    _startDownload();
+  }
+
+  Future<void> _startDownload() async {
+    setState(() {
+      _downloading = true;
+    });
+
+    try {
+      final serverDownload = Server();
+      await serverDownload.downloadRepo();
+    } catch (error) {
+      print('Error during download: $error');
+      // Handle error as needed
+    } finally {
+      setState(() {
+        _downloading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: _downloading
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  Text("Downloading necessary files")
+                ],
+              )
+            : Text('Download Complete'),
+      ),
+    );
   }
 }

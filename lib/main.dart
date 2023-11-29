@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:share_app_local/components/widgets/copy_open.dart';
 import 'package:share_app_local/models/json_message.dart';
 import 'package:share_app_local/services/directory_handler.dart';
+import 'package:share_app_local/utils/utilities.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -46,14 +47,18 @@ class _MyHomePageState extends State<MyHomePage> {
   Server server = Server();
 
   Directories directories = Directories();
+  List<String> paths = [];
+
+  String? selectedUser;
 
   @override
   void initState() {
     super.initState();
     listMessages = [];
     messageLoader = MessageLoader();
+    paths = messageLoader.listDirectories();
 
-    messageLoader.loadMessages();
+    selectedUser = messageLoader.listDirectories().first;
   }
 
   @override
@@ -65,14 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int? pythonProcess;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          server.downloadRepo();
-        },
-      ),
-      body: _buildHomePage(),
-    );
+    return Scaffold(body: _buildHomePage());
   }
 
   Scaffold _buildHomePage() {
@@ -99,6 +97,25 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
+        actions: [
+          DropdownButton<String>(
+            value: selectedUser,
+            onChanged: (newValue) {
+              setState(() {
+                selectedUser = newValue;
+
+                print("selecteduser: $selectedUser");
+              });
+              messageLoader.loadMessages("${selectedUser}_messages");
+            },
+            items: paths.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+        ],
       ),
       body: Center(
         child: StreamBuilder<List<Message>>(
