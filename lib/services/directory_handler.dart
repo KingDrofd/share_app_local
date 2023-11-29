@@ -10,7 +10,13 @@ class Directories {
   }
 
   File getServerFilePath() {
-    File serverFile = File('$getInstallationDirectory/py_serv_env/server.py');
+    File serverFile =
+        File('${getInstallationDirectory()}\\py_serv_env\\server.py');
     return serverFile;
+  }
+
+  bool fileExists(String path) {
+    File file = File(path);
+    return file.existsSync();
   }
 }
