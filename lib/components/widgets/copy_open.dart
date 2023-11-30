@@ -37,7 +37,10 @@ class _CopyOpenState extends State<CopyOpen> {
                   color: Colors.white,
                   size: 25,
                 ),
-                onTap: () {},
+                onTap: () {
+                  messageHandler.handleLinkMessage(
+                      widget.listMessages[widget.index].content);
+                },
               )
             : SizedBox(
                 width: 50,

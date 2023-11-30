@@ -16,6 +16,7 @@ class MessageHandler {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+          duration: Duration(milliseconds: 500),
           content: Text(
             "Copied to clipboard",
             style: TextStyle(color: Colors.white),

@@ -13,21 +13,31 @@ class MessageLoader {
 
   Stream<List<Message>> get messageStream => _streamController.stream;
   bool loadingMessages = false;
+  Timer? _timer;
+
   Future<void> loadMessages(String name) async {
     try {
-      while (true) {
-        // Specify the path to the directory
+      // Clear the timer if it already exists
+      _timer?.cancel();
 
-        // List directories in the specified path
-        loadingMessages = true;
-        // Read the data continuously
-        List<Message> loadedMessages = await readJsonFile(name);
-        _streamController.add(loadedMessages);
-        await Future.delayed(Duration(milliseconds: 5));
-      }
+      // Schedule a periodic task to load messages
+      _timer = Timer.periodic(Duration(milliseconds: 5), (_) async {
+        try {
+          List<Message> loadedMessages = await readJsonFile(name);
+          _streamController.add(loadedMessages);
+        } catch (e) {
+          print("Error loading messages: $e");
+        }
+      });
     } catch (e) {
-      print("error loading messages: $e");
+      print("Error scheduling timer: $e");
     }
+  }
+
+  // Add a method to stop the periodic loading when necessary
+  void stopLoading() {
+    _timer?.cancel();
+    _streamController.close();
   }
 
   List<String> listDirectories() {
@@ -64,7 +74,8 @@ class MessageLoader {
   Future<List<Message>> readJsonFile(String name) async {
     try {
       // Get the path to the JSON file
-      String? filePath = "C:/Users/kingd/Documents/uploads/$name/messages.json";
+      String? filePath =
+          "C:/Users/kingd/Documents/uploads/${name}_messages/messages.json";
 
       // Read the file
       File file = File(filePath);
