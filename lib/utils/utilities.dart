@@ -11,3 +11,5 @@ bool isLink(String input) {
     return false;
   }
 }
+
+bool isLoading = false;

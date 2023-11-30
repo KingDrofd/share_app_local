@@ -29,19 +29,15 @@ class _ListComponentState extends State<ListComponent> {
           alignment: Alignment.centerLeft,
           height: 50,
           decoration: BoxDecoration(
-              color: Color.fromARGB(255, 235, 226, 255),
+              color: const Color.fromARGB(255, 183, 170, 170),
               borderRadius: BorderRadius.circular(10)),
           child: Padding(
             padding: const EdgeInsets.only(
               left: 20,
             ),
-            child: Column(
-              children: [
-                Text(
-                  widget.listMessages[widget.index].content,
-                  style: GoogleFonts.roboto(fontSize: 14),
-                ),
-              ],
+            child: Text(
+              widget.listMessages[widget.index].content,
+              style: GoogleFonts.arimo(fontSize: 17, color: Colors.black),
             ),
           )),
     );

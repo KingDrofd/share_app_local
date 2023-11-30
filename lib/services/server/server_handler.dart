@@ -26,9 +26,9 @@ class Server {
   }
 
   Future<void> launchPythonScript() async {
-    var result = await Process.start(
-        '/Users/regadabdellah/Documents/Github/FlutterProjects/share_app/python_env/server_env/dist/server',
-        []);
+    var result = await Process.run("python", [
+      "C:/Users/kingd/Documents/GitHub/shareIt/share_app_local/build/windows/x64/runner/Debug/py_serv_env/server.py"
+    ]);
 
     result.stdout.transform(utf8.decoder).forEach(print);
   }

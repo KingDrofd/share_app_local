@@ -8,7 +8,6 @@ class ServerDownload {
       String owner, String repo, String targetDirectory) async {
     final url = 'https://api.github.com/repos/$owner/$repo/zipball';
     final response = await http.get(Uri.parse(url));
-
     if (response.statusCode == 200) {
       final List<int> bytes = response.bodyBytes;
       final String zipPath = '$targetDirectory/$repo.zip';

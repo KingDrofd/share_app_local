@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Read Json',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -59,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
     paths = messageLoader.listDirectories();
 
     selectedUser = messageLoader.listDirectories().first;
+    messageLoader.loadMessages("$selectedUser");
   }
 
   @override
@@ -78,9 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          var url = Uri.parse(listMessages.last.content);
-
-          launchUrl(url);
+          server.launchPythonScript();
         },
         child: const Icon(
           Icons.launch,
@@ -88,49 +88,110 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color.fromARGB(255, 183, 58, 58),
         title: Center(
-          child: Text(
-            "Desktop Server",
-            style: GoogleFonts.roboto(
-              color: Colors.white,
-            ),
-          ),
-        ),
-        actions: [
-          DropdownButton<String>(
+          child: DropdownButton<String>(
             value: selectedUser,
+            elevation: 12,
+            iconEnabledColor: Colors.white,
+            dropdownColor: const Color.fromARGB(255, 183, 58, 58),
+            focusColor: Colors.transparent,
+            underline: Container(),
+            style: GoogleFonts.arimo(color: Colors.white, fontSize: 20),
             onChanged: (newValue) {
               setState(() {
-                selectedUser = newValue;
+                // Stop ongoing loading for the previous user
+                if (isLoading) {}
 
-                print("selecteduser: $selectedUser");
+                // Start loading for the new user
+                selectedUser = newValue;
+                messageLoader.loadMessages(selectedUser!);
               });
-              messageLoader.loadMessages("${selectedUser}_messages");
             },
             items: paths.map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
-                child: Text(value),
+                child: Text(
+                  value,
+                ),
               );
             }).toList(),
           ),
-        ],
+        ),
+        actions: [],
       ),
       body: Center(
-        child: StreamBuilder<List<Message>>(
-          stream: messageLoader.messageStream,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              listMessages = snapshot.data ?? [];
+        child: Column(
+          children: [
+            Expanded(
+              flex: 2,
+              child: StreamBuilder<List<Message>>(
+                stream: messageLoader.messageStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    listMessages = snapshot.data ?? [];
 
-              return _buildListView();
-            }
-          },
+                    return _buildListView();
+                  }
+                },
+              ),
+            ),
+            // Expanded(
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //     children: [
+            //       Padding(
+            //         padding: const EdgeInsets.all(8.0),
+            //         child: Container(
+            //           decoration: BoxDecoration(
+            //             image: DecorationImage(
+            //               fit: BoxFit.cover,
+            //               image: AssetImage("assets/placeholder.png"),
+            //             ),
+            //             boxShadow: <BoxShadow>[
+            //               BoxShadow(
+            //                   offset: Offset(0, 0),
+            //                   color: Colors.black.withOpacity(.2),
+            //                   blurRadius: 6,
+            //                   spreadRadius: 5),
+            //             ],
+            //             borderRadius: BorderRadius.circular(20),
+            //             color: Colors.white,
+            //           ),
+            //           alignment: Alignment.center,
+            //           width: 150,
+            //           height: 150,
+            //         ),
+            //       ),
+            //       Padding(
+            //         padding: const EdgeInsets.all(8.0),
+            //         child: Container(
+            //           decoration: BoxDecoration(
+            //             image: DecorationImage(
+            //               fit: BoxFit.cover,
+            //               image: AssetImage("assets/video_placeholder.jpg"),
+            //             ),
+            //             boxShadow: <BoxShadow>[
+            //               BoxShadow(
+            //                   offset: Offset(0, 0),
+            //                   color: Colors.black.withOpacity(.2),
+            //                   blurRadius: 6,
+            //                   spreadRadius: 5),
+            //             ],
+            //             borderRadius: BorderRadius.circular(20),
+            //             color: Colors.white,
+            //           ),
+            //           alignment: Alignment.center,
+            //           width: 150,
+            //           height: 150,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // )
+          ],
         ),
       ),
     );
