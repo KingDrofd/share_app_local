@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:share_app_local/components/widgets/copy_open.dart';
@@ -26,8 +27,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Read Json',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
+          // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: false,
         ),
         home: const MyHomePage(title: "READ JSON"));
   }
@@ -77,122 +78,123 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Scaffold _buildHomePage() {
     return Scaffold(
-      backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          server.launchPythonScript();
-        },
-        child: const Icon(
-          Icons.launch,
-          size: 25,
-        ),
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      // floatingActionButton: Row(
+      //   mainAxisAlignment: MainAxisAlignment.center,
+      //   children: [
+      //     FloatingActionButton(
+      //       onPressed: () {
+      //         //server.launchPythonScript();
+
+      //         setState(() {
+      //           toggleButtons = !toggleButtons;
+      //         });
+      //       },
+      //       child: Icon(
+      //         toggleButtons ? Icons.toggle_on : Icons.toggle_off,
+      //         size: 25,
+      //       ),
+      //     ),
+      //     Gap(10),
+      //     FloatingActionButton(
+      //       onPressed: () {
+      //         //server.launchPythonScript();
+
+      //         setState(() {
+      //           toggleSelectable = !toggleSelectable;
+      //         });
+      //       },
+      //       child: const Icon(
+      //         Icons.launch,
+      //         size: 25,
+      //       ),
+      //     ),
+      //   ],
+      // ),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 183, 58, 58),
-        title: Center(
-          child: DropdownButton<String>(
-            value: selectedUser,
-            elevation: 12,
-            iconEnabledColor: Colors.white,
-            dropdownColor: const Color.fromARGB(255, 183, 58, 58),
-            focusColor: Colors.transparent,
-            underline: Container(),
-            style: GoogleFonts.arimo(color: Colors.white, fontSize: 20),
-            onChanged: (newValue) {
-              setState(() {
-                // Stop ongoing loading for the previous user
-                if (isLoading) {}
-
-                // Start loading for the new user
-                selectedUser = newValue;
-                messageLoader.loadMessages(selectedUser!);
-              });
-            },
-            items: paths.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        actions: [],
-      ),
-      body: Center(
-        child: Column(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10))),
+        backgroundColor: Colors.black,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              flex: 2,
-              child: StreamBuilder<List<Message>>(
-                stream: messageLoader.messageStream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    listMessages = snapshot.data ?? [];
+            PopupMenuButton<String>(
+              icon: Icon(Icons.person),
+              itemBuilder: (BuildContext context) {
+                return paths.map((String value) {
+                  return PopupMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList();
+              },
+              onSelected: (String value) {
+                setState(() {
+                  // Stop ongoing loading for the previous user
+                  if (isLoading) {}
 
-                    return _buildListView();
-                  }
-                },
-              ),
+                  // Start loading for the new user
+                  selectedUser = value;
+                  messageLoader.loadMessages(selectedUser!);
+                });
+              },
             ),
-            // Expanded(
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //     children: [
-            //       Padding(
-            //         padding: const EdgeInsets.all(8.0),
-            //         child: Container(
-            //           decoration: BoxDecoration(
-            //             image: DecorationImage(
-            //               fit: BoxFit.cover,
-            //               image: AssetImage("assets/placeholder.png"),
-            //             ),
-            //             boxShadow: <BoxShadow>[
-            //               BoxShadow(
-            //                   offset: Offset(0, 0),
-            //                   color: Colors.black.withOpacity(.2),
-            //                   blurRadius: 6,
-            //                   spreadRadius: 5),
-            //             ],
-            //             borderRadius: BorderRadius.circular(20),
-            //             color: Colors.white,
-            //           ),
-            //           alignment: Alignment.center,
-            //           width: 150,
-            //           height: 150,
-            //         ),
-            //       ),
-            //       Padding(
-            //         padding: const EdgeInsets.all(8.0),
-            //         child: Container(
-            //           decoration: BoxDecoration(
-            //             image: DecorationImage(
-            //               fit: BoxFit.cover,
-            //               image: AssetImage("assets/video_placeholder.jpg"),
-            //             ),
-            //             boxShadow: <BoxShadow>[
-            //               BoxShadow(
-            //                   offset: Offset(0, 0),
-            //                   color: Colors.black.withOpacity(.2),
-            //                   blurRadius: 6,
-            //                   spreadRadius: 5),
-            //             ],
-            //             borderRadius: BorderRadius.circular(20),
-            //             color: Colors.white,
-            //           ),
-            //           alignment: Alignment.center,
-            //           width: 150,
-            //           height: 150,
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // )
+            Text(selectedUser!),
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.delete),
+            ),
           ],
         ),
+        actions: [
+          PopupMenuButton<String>(
+            itemBuilder: (BuildContext context) {
+              return <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  onTap: () {
+                    setState(() {
+                      toggleButtons = !toggleButtons;
+                    });
+                  },
+                  value: 'Toggle right buttons',
+                  child: Text(toggleButtons ? 'Hide buttons' : 'Show buttons'),
+                ),
+                PopupMenuItem<String>(
+                  onTap: () {
+                    setState(() {
+                      toggleSelectable = !toggleSelectable;
+                    });
+                  },
+                  value: 'Togggle Button list',
+                  child: Text(toggleSelectable
+                      ? 'Turn off button list'
+                      : 'Turn on button list'),
+                ),
+              ];
+            },
+          ),
+        ],
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Center(
+            child: StreamBuilder<List<Message>>(
+              stream: messageLoader.messageStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  listMessages = snapshot.data ?? [];
+
+                  return _buildListView();
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -203,21 +205,31 @@ class _MyHomePageState extends State<MyHomePage> {
       itemBuilder: (context, index) {
         if (index < listMessages.length) {
           return Padding(
-            padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding:
+                const EdgeInsets.only(top: 10, left: 8, right: 8, bottom: 10),
+            child: Column(
               children: [
-                ListComponent(
-                  listMessages: listMessages,
-                  index: index,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ListComponent(
+                      listMessages: listMessages,
+                      index: index,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    if (toggleButtons)
+                      CopyOpen(
+                          messageLoader: messageLoader,
+                          index: index,
+                          listMessages: listMessages),
+                  ],
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
-                CopyOpen(
-                    messageLoader: messageLoader,
-                    index: index,
-                    listMessages: listMessages),
+                // Divider(
+                //   height: 2,
+                //   indent: 2,
+                // )
               ],
             ),
           );
