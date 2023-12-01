@@ -17,10 +17,9 @@ class _CustomButtonState extends State<CustomButton> {
         width: 50,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
         child: RawMaterialButton(
-            fillColor: const Color.fromARGB(255, 183, 58, 58),
             onPressed: widget.onTap,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            fillColor: Colors.grey[100],
+            shape: CircleBorder(),
             child: widget.child));
   }
 }

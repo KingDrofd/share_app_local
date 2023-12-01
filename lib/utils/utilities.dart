@@ -13,3 +13,7 @@ bool isLink(String input) {
 }
 
 bool isLoading = false;
+
+bool toggleButtons = false;
+
+bool toggleSelectable = false;

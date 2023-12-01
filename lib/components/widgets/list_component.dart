@@ -1,6 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_app_local/models/json_message.dart';
+import 'package:share_app_local/services/messages/message_handler.dart'
+    as _messageHandler;
+import '../../utils/utilities.dart';
 
 class ListComponent extends StatefulWidget {
   const ListComponent({
@@ -17,6 +22,8 @@ class ListComponent extends StatefulWidget {
 }
 
 class _ListComponentState extends State<ListComponent> {
+  bool isElevated = false;
+
   @override
   void initState() {
     super.initState();
@@ -24,22 +31,124 @@ class _ListComponentState extends State<ListComponent> {
 
   @override
   Widget build(BuildContext context) {
+    _messageHandler.MessageHandler messageHandler =
+        _messageHandler.MessageHandler(context);
     return Expanded(
-      child: Container(
-          alignment: Alignment.centerLeft,
-          height: 50,
-          decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 183, 170, 170),
-              borderRadius: BorderRadius.circular(10)),
-          child: Padding(
-            padding: const EdgeInsets.only(
-              left: 20,
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
             ),
-            child: Text(
-              widget.listMessages[widget.index].content,
-              style: GoogleFonts.arimo(fontSize: 17, color: Colors.black),
+            child: SvgPicture.asset(
+              isLink(widget.listMessages[widget.index].type)
+                  ? "assets/link.svg"
+                  : "assets/document.svg",
+              height: 50,
             ),
-          )),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: toggleSelectable
+                ? MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onHorizontalDragStart: (details) {
+                        isElevated = false;
+                      },
+                      onVerticalDragStart: (details) {
+                        isElevated = false;
+                      },
+                      onTapDown: (details) {
+                        setState(() {
+                          isElevated = true;
+                        });
+                      },
+                      onTapUp: (details) async {
+                        await Future.delayed(Duration(milliseconds: 100));
+                        setState(() {
+                          isElevated = false;
+                          isLink(widget.listMessages[widget.index].type)
+                              ? messageHandler.handleLinkMessage(
+                                  widget.listMessages[widget.index].content)
+                              : messageHandler.handleTextMessage(
+                                  widget.listMessages[widget.index].content);
+                        });
+                      },
+                      child: AnimatedContainer(
+                          duration: Duration(milliseconds: 50),
+                          alignment: Alignment.centerLeft,
+                          height: 70,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                    offset: Offset(4, 4),
+                                    blurRadius: 5,
+                                    spreadRadius: -2,
+                                    color: Colors.grey[500]!,
+                                    inset: isElevated),
+                                BoxShadow(
+                                    offset: Offset(-4, -4),
+                                    blurRadius: 5,
+                                    spreadRadius: -2,
+                                    color: Colors.grey[100]!,
+                                    inset: isElevated),
+                              ]),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 20,
+                            ),
+                            child: Text(
+                              widget.listMessages[widget.index].content,
+                              style: GoogleFonts.arimo(
+                                fontSize: 17,
+                                color: Colors.black,
+                              ),
+                            ),
+                          )),
+                    ),
+                  )
+                : AnimatedContainer(
+                    duration: Duration(milliseconds: 50),
+                    alignment: Alignment.centerLeft,
+                    height: 70,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                              offset: Offset(4, 4),
+                              blurRadius: 5,
+                              spreadRadius: -2,
+                              color: Colors.grey[500]!,
+                              inset: isElevated),
+                          BoxShadow(
+                              offset: Offset(-4, -4),
+                              blurRadius: 5,
+                              spreadRadius: -2,
+                              color: Colors.grey[100]!,
+                              inset: isElevated),
+                        ]),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                      ),
+                      child: SelectableText(
+                        widget.listMessages[widget.index].content,
+                        style: GoogleFonts.arimo(
+                          fontSize: 17,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

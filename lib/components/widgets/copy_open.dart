@@ -34,7 +34,7 @@ class _CopyOpenState extends State<CopyOpen> {
             ? CustomButton(
                 child: Icon(
                   Icons.launch_rounded,
-                  color: Colors.white,
+                  color: Colors.black,
                   size: 25,
                 ),
                 onTap: () {
@@ -42,10 +42,7 @@ class _CopyOpenState extends State<CopyOpen> {
                       widget.listMessages[widget.index].content);
                 },
               )
-            : SizedBox(
-                width: 50,
-                height: 50,
-              ),
+            : Container(),
         SizedBox(width: 10),
         CustomButton(
           onTap: () {
@@ -54,7 +51,7 @@ class _CopyOpenState extends State<CopyOpen> {
           },
           child: Icon(
             Icons.copy_rounded,
-            color: Colors.white,
+            color: Colors.black,
             size: 25,
           ),
         ),
