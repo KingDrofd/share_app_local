@@ -37,14 +37,21 @@ class _ListComponentState extends State<ListComponent> {
       child: Row(
         children: [
           Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-            ),
+            decoration:
+                BoxDecoration(shape: BoxShape.circle, boxShadow: <BoxShadow>[
+              BoxShadow(
+                  color: Colors.grey.shade300,
+                  offset: Offset(4, 4),
+                  blurRadius: 5,
+                  spreadRadius: 2),
+            ]),
             child: SvgPicture.asset(
               isLink(widget.listMessages[widget.index].type)
                   ? "assets/link.svg"
                   : "assets/document.svg",
-              height: 50,
+              // colorFilter: ColorFilter.mode(
+              //     Color.fromRGBO(37, 0, 89, 1), BlendMode.srcIn),
+              height: 60,
             ),
           ),
           const SizedBox(
@@ -104,7 +111,7 @@ class _ListComponentState extends State<ListComponent> {
                             ),
                             child: Text(
                               widget.listMessages[widget.index].content,
-                              style: GoogleFonts.arimo(
+                              style: GoogleFonts.rubik(
                                 fontSize: 17,
                                 color: Colors.black,
                               ),
@@ -139,7 +146,7 @@ class _ListComponentState extends State<ListComponent> {
                       ),
                       child: SelectableText(
                         widget.listMessages[widget.index].content,
-                        style: GoogleFonts.arimo(
+                        style: GoogleFonts.rubik(
                           fontSize: 17,
                           color: Colors.black,
                         ),

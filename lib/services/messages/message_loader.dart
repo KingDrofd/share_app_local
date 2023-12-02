@@ -2,10 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:path_provider/path_provider.dart';
+import 'package:share_app_local/services/directory_handler.dart';
+
 import '../../models/json_message.dart';
 
 class MessageLoader {
   late StreamController<List<Message>> _streamController;
+  Directories directories = Directories();
 
   MessageLoader() {
     _streamController = StreamController<List<Message>>();
@@ -40,45 +44,21 @@ class MessageLoader {
     _streamController.close();
   }
 
-  List<String> listDirectories() {
-    try {
-      // Get a list of directories in the specified path
-      List<FileSystemEntity> entities =
-          Directory("C:/Users/kingd/Documents/uploads/")
-              .listSync(followLinks: false);
-
-      List<String> jsonNames = [];
-
-      // Extract only the directories from the list
-      for (var subDirectory in entities) {
-        if (subDirectory is Directory) {
-          File messagesFile = File('${subDirectory.path}/messages.json');
-          if (messagesFile.existsSync()) {
-            String jsonContent = messagesFile.readAsStringSync();
-
-            Map<String, dynamic> jsonData = jsonDecode(jsonContent);
-            jsonNames.add(jsonData['name']);
-          } else {
-            print('messages.json not found in ${subDirectory.path}');
-          }
-        }
-      }
-
-      return jsonNames;
-    } catch (e) {
-      print('Error listing directories: $e');
-      return [];
-    }
-  }
-
   Future<List<Message>> readJsonFile(String name) async {
     try {
       // Get the path to the JSON file
-      String? filePath =
-          "C:/Users/kingd/Documents/uploads/${name}_messages/messages.json";
+      String appDocumentsDir = await directories.getDocumentsDirectoryPath();
+      String filePath =
+          "$appDocumentsDir/uploads/${name}_messages/messages.json";
+
+      // Check if the file exists
+      File file = File(filePath);
+      if (!file.existsSync()) {
+        print('File does not exist at the specified path: $filePath');
+        return [];
+      }
 
       // Read the file
-      File file = File(filePath);
       String content = await file.readAsString();
 
       // Parse the JSON content

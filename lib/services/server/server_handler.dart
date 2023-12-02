@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'package:share_app_local/main.dart';
+
 import 'package:share_app_local/services/directory_handler.dart';
 import 'package:share_app_local/services/server/server_download.dart';
 import 'package:share_app_local/utils/utilities.dart';
@@ -11,26 +12,63 @@ class Server {
   ServerDownload repo = ServerDownload();
 
   Directories directories = Directories();
-
+  Process? process;
   Future<void> checkPythonVersion() async {
     try {
-      var result = await Process.run('python', ['--version']);
-      print(result.stdout);
+      var result = await Process.start('python', ['--version']);
     } catch (e) {
       print('Error checking Python version: $e');
     }
   }
 
-  void killPythonScript() {
-    Process.killPid(30924);
+  Future<void> killPythonScript(BuildContext context) async {
+    await Process.run('powershell', ['-Command', 'Stop-Process -Name server']);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          duration: Duration(milliseconds: 1000),
+          content: Text(
+            "Server Stopped",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-  Future<void> launchPythonScript() async {
-    var result = await Process.run("python", [
-      "C:/Users/kingd/Documents/GitHub/shareIt/share_app_local/build/windows/x64/runner/Debug/py_serv_env/server.py"
-    ]);
+  Future<bool> isProcessNameRunning(String processName) async {
+    try {
+      // Run the 'ps' command to list all processes and filter by the process name
+      ProcessResult result = await Process.run('ps', ['aux']);
+      String psOutput = result.stdout as String;
 
-    result.stdout.transform(utf8.decoder).forEach(print);
+      // Check if the process name appears in the output
+      print(psOutput.contains(processName));
+      return psOutput.contains(processName);
+    } catch (e) {
+      // An exception may occur if the 'ps' command fails
+      return false;
+    }
+  }
+
+  Future<void> launchPythonScript(BuildContext context) async {
+    var result = await Process.start(
+        "${directories.getInstallationDirectory()}\\py_serv_env\\dist\\server.exe",
+        []);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          duration: Duration(milliseconds: 1000),
+          content: Text(
+            "Server Started",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+    process = result;
   }
 
   Future<void> downloadRepo() async {
@@ -42,7 +80,7 @@ class Server {
       print(
           'No server.py found in the installation directory at: ${directories.getInstallationDirectory()}\\py_serv_env.');
 
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 1));
 
       print("Cloning...");
 
@@ -89,6 +127,7 @@ class _DownloadProgressState extends State<DownloadProgress> {
     } finally {
       setState(() {
         _downloading = false;
+        isDownloaded = true;
       });
     }
   }
@@ -105,7 +144,7 @@ class _DownloadProgressState extends State<DownloadProgress> {
                   Text("Downloading necessary files")
                 ],
               )
-            : Text('Download Complete'),
+            : MyHomePage(),
       ),
     );
   }

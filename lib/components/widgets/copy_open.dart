@@ -34,7 +34,7 @@ class _CopyOpenState extends State<CopyOpen> {
             ? CustomButton(
                 child: Icon(
                   Icons.launch_rounded,
-                  color: Colors.black,
+                  color: Color.fromARGB(255, 37, 0, 89),
                   size: 25,
                 ),
                 onTap: () {
@@ -51,7 +51,7 @@ class _CopyOpenState extends State<CopyOpen> {
           },
           child: Icon(
             Icons.copy_rounded,
-            color: Colors.black,
+            color: Color.fromARGB(255, 37, 0, 89),
             size: 25,
           ),
         ),

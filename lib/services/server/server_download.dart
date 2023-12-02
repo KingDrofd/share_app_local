@@ -24,7 +24,7 @@ class ServerDownload {
         }
       }
 
-      final extractedDirName = 'KingDrofd-py_serv_env-ed8e13a';
+      final extractedDirName = 'KingDrofd-py_serv_env-3b058dd';
       final extractedDirPath = path.join(targetDirectory, extractedDirName);
       final repoDirPath = path.join(targetDirectory, repo);
 

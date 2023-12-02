@@ -13,12 +13,13 @@ class _CustomButtonState extends State<CustomButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 50,
-        width: 50,
+        height: 55,
+        width: 55,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
         child: RawMaterialButton(
+            elevation: 6,
             onPressed: widget.onTap,
-            fillColor: Colors.grey[100],
+            fillColor: Color.fromARGB(255, 220, 204, 242),
             shape: CircleBorder(),
             child: widget.child));
   }

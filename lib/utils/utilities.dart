@@ -17,3 +17,5 @@ bool isLoading = false;
 bool toggleButtons = false;
 
 bool toggleSelectable = false;
+
+bool isDownloaded = false;
